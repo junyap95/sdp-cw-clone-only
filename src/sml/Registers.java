@@ -22,6 +22,11 @@ public final class Registers {
         //      methods of the class in constructors.
         //      Why is it? And why is it safe in this case?
         //      Write a short explanation.
+        // It is not recommended because if there is a subclass that extends this class it will make the subclass object creation inconsistent
+        // If that method can be overridden, it will make the superclass constructor inconsistent
+        // Complex processing in constructor is known to have a negative impact on testability.
+        // It is safe in this case because Registers is a final class which cannot be extended by other subclasses
+        // It also fits the logic of this class because a when a new Registers class is instantiated, it has to initialise the hashmap that contains 6 registers of value 0
         clear();
     }
 

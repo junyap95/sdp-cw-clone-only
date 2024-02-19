@@ -77,6 +77,29 @@ public final class Translator {
                 return new MovInstruction(label, getDestination(d, machine), getSource(s, machine));
             }
 
+            case MulInstruction.OP_CODE -> {
+                String d = scan(false);
+                String s = MulInstruction.REG_AX;
+                return new MulInstruction(label, getDestination(s, machine), getSource(d, machine));
+            }
+
+            case SubInstruction.OP_CODE -> {
+                String d = scan(true);
+                String s = scan(false);
+                return new SubInstruction(label, getDestination(d, machine), getSource(s, machine));
+            }
+
+            case CmpInstruction.OP_CODE -> {
+                String d = scan(true);
+                String s = scan(false);
+                return new CmpInstruction(label, getDestination(d, machine), getSource(s, machine));
+            }
+
+            case JgeInstruction.OP_CODE -> {
+                String d = scan(false);
+                return new JgeInstruction(label, d);
+            }
+
             // TODO: add code for all other types of instructions
 
             // TODO: Then, replace the switch by using the Reflection API

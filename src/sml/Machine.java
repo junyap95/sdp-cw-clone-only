@@ -45,6 +45,7 @@ public final class Machine {
         programCounter = 0;
         registers.clear();
         int programSize = program.values().stream().mapToInt(Instruction::getSize).sum();
+
         while (programCounter < programSize) {
             Instruction ins = program.get(programCounter);
             System.out.println("[" + programCounter + "] " + ins);
@@ -94,6 +95,8 @@ public final class Machine {
             return Objects.equals(this.labels, other.labels)
                     && Objects.equals(this.program, other.program)
                     && Objects.equals(this.registers, other.registers)
+                    && Objects.equals(this.memory, other.memory)
+                    && Objects.equals(this.flags, other.flags)
                     && this.programCounter == other.programCounter;
         }
         return false;
