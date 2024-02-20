@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 
+import static sml.Registers.RegisterNameImpl.AX;
+
 /**
  * This class ....
  * <p>
@@ -79,8 +81,8 @@ public final class Translator {
 
             case MulInstruction.OP_CODE -> {
                 String d = scan(false);
-                String s = MulInstruction.REG_AX;
-                return new MulInstruction(label, getDestination(s, machine), getSource(d, machine));
+                String registerName = AX.name();
+                return new MulInstruction(label, getDestination(registerName, machine), getSource(d, machine));
             }
 
             case SubInstruction.OP_CODE -> {
