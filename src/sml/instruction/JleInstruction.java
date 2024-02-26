@@ -1,11 +1,11 @@
 package sml.instruction;
 
-import sml.*;
+import sml.Machine;
 
-public class JgeInstruction extends InstructionWithAddress {
-    public static final String OP_CODE = "jge";
+public class JleInstruction extends InstructionWithAddress {
+    public static final String OP_CODE = "jle";
 
-    public JgeInstruction(String label, String address) {
+    public JleInstruction(String label, String address) {
         super(label, OP_CODE, address);
     }
 
@@ -13,7 +13,7 @@ public class JgeInstruction extends InstructionWithAddress {
     public int execute(Machine m) {
         boolean ZF = m.getFlags().getZF();
         boolean SF = m.getFlags().getSF();
-        if(ZF || !SF) {
+        if(ZF || SF) {
             return m.getOffset(this.address);
         }
         return getSize();

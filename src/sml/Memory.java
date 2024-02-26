@@ -18,6 +18,8 @@ public class Memory {
         this.contents = new int[size];
     }
 
+    // [offset] refers to the cell with address offset
+    // where offset is an integer
     public int get(int address) {
         usedCells.set(address);
         return contents[address];

@@ -81,8 +81,13 @@ public final class Translator {
 
             case MulInstruction.OP_CODE -> {
                 String d = scan(false);
-                String registerName = AX.name();
-                return new MulInstruction(label, getDestination(registerName, machine), getSource(d, machine));
+                return new MulInstruction(label, getSource(d, machine));
+            }
+
+            case AddInstruction.OP_CODE -> {
+                String d = scan(true);
+                String s = scan(false);
+                return new AddInstruction(label, getDestination(d, machine), getSource(s, machine));
             }
 
             case SubInstruction.OP_CODE -> {
@@ -100,6 +105,16 @@ public final class Translator {
             case JgeInstruction.OP_CODE -> {
                 String d = scan(false);
                 return new JgeInstruction(label, d);
+            }
+
+            case JleInstruction.OP_CODE -> {
+                String d = scan(false);
+                return new JleInstruction(label, d);
+            }
+
+            case JneInstruction.OP_CODE -> {
+                String d = scan(false);
+                return new JneInstruction(label, d);
             }
 
             // TODO: add code for all other types of instructions

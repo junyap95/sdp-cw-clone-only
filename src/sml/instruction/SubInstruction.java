@@ -1,12 +1,10 @@
 package sml.instruction;
 
-import sml.Instruction;
 import sml.InstructionDestination;
 import sml.InstructionSource;
 import sml.Machine;
-import java.util.Objects;
 
-public class SubInstruction extends InstructionAuxiliary {
+public class SubInstruction extends InstructionWithDestAndSrc {
 
     public static final String OP_CODE = "sub";
 
@@ -17,8 +15,8 @@ public class SubInstruction extends InstructionAuxiliary {
     @Override
     public int execute(Machine m) {
         int value = source.getValue(); // 1
-        int res = result.getValue();
-        result.setValue(res - value);
+        int res = destination.getValue();
+        destination.setValue(res - value);
         return getSize();
     }
 

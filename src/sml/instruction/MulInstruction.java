@@ -1,27 +1,25 @@
 package sml.instruction;
 
-import sml.InstructionDestination;
-import sml.InstructionSource;
-import sml.Machine;
+import sml.*;
 
-public class MulInstruction extends InstructionAuxiliary {
+import static sml.Registers.RegisterNameImpl.AX;
+import static sml.Registers.RegisterNameImpl.DX;
+
+public class MulInstruction extends InstructionWithSourceOnly {
     public static final String OP_CODE = "mul";
 
-    public MulInstruction(String label,InstructionDestination destination, InstructionSource source) {
-        super(label, OP_CODE, destination, source);
-    }
-
-    @Override
-    public int getSize() {
-        return 1 + source.getSize();
+    public MulInstruction(String label, InstructionSource source) {
+        super(label, OP_CODE, source);
     }
 
     @Override
     public int execute(Machine m) {
-        int valueAX = result.getValue();
-        int valueCX = source.getValue();
-        result.setValue(valueAX * valueCX);
+        Registers registers = m.getRegisters();
+        long valueAX = m.getRegisters().get(AX);
+        long valueCX = source.getValue();
+        long mulResult = valueAX * valueCX;
+        registers.set(AX, (int) (mulResult));
+        registers.set(DX, (int) (mulResult >> 32));
         return getSize();
     }
-
 }

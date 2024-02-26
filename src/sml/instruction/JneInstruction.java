@@ -1,19 +1,18 @@
 package sml.instruction;
 
-import sml.*;
+import sml.Machine;
 
-public class JgeInstruction extends InstructionWithAddress {
-    public static final String OP_CODE = "jge";
+public class JneInstruction extends InstructionWithAddress {
+    public static final String OP_CODE = "jne";
 
-    public JgeInstruction(String label, String address) {
+    public JneInstruction(String label, String address) {
         super(label, OP_CODE, address);
     }
 
     @Override
     public int execute(Machine m) {
         boolean ZF = m.getFlags().getZF();
-        boolean SF = m.getFlags().getSF();
-        if(ZF || !SF) {
+        if(!ZF) {
             return m.getOffset(this.address);
         }
         return getSize();

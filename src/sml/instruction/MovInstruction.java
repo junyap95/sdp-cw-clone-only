@@ -1,24 +1,25 @@
 package sml.instruction;
 
-import sml.Instruction;
 import sml.InstructionDestination;
 import sml.InstructionSource;
 import sml.Machine;
 
-import java.util.Objects;
-
-public class MovInstruction extends InstructionAuxiliary {
+public class MovInstruction extends InstructionWithDestAndSrc {
 
     public static final String OP_CODE = "mov";
 
-    public MovInstruction(String label, InstructionDestination result, InstructionSource source) {
-        super(label, OP_CODE, result, source);
+    public MovInstruction(String label, InstructionDestination destination, InstructionSource source) {
+        super(label, OP_CODE, destination, source);
     }
 
     @Override
     public int execute(Machine m) {
+        // if [reg] , destination would be parsed in translator
+        // and gives us OperandMemoryWithBase object
+        // getValue() returns address
+
         int value = source.getValue();
-        result.setValue(value);
+        destination.setValue(value);
         return getSize();
     }
 

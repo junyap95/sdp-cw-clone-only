@@ -4,10 +4,11 @@ import sml.InstructionDestination;
 import sml.InstructionSource;
 import sml.Machine;
 
-public class CmpInstruction extends InstructionWithDestAndSrc {
-    public static final String OP_CODE = "cmp";
+public class AddInstruction extends InstructionWithDestAndSrc {
 
-    public CmpInstruction(String label, InstructionDestination result, InstructionSource source) {
+    public static final String OP_CODE = "add";
+
+    public AddInstruction(String label, InstructionDestination result, InstructionSource source) {
         super(label, OP_CODE, result, source);
     }
 
@@ -15,8 +16,7 @@ public class CmpInstruction extends InstructionWithDestAndSrc {
     public int execute(Machine m) {
         int value = source.getValue(); // 1
         int res = destination.getValue();
-        m.getFlags().setZF(value == res);
-        m.getFlags().setSF(res < value);
+        destination.setValue(res + value);
         return getSize();
     }
 }

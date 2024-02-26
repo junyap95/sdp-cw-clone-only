@@ -7,16 +7,26 @@ import java.util.stream.Stream;
 // TODO: write a JavaDoc for the class
 
 /**
- *
- * @author ...
+ * Represents a set of registers with associated values.
  */
 public final class Registers {
+    /**
+     * Map to store the values of registers.
+     * Key: RegisterNameImpl (enum representing register names)
+     * Value: Integer (value of the register)
+     */
     private final Map<RegisterNameImpl, Integer> registers = new HashMap<>();
 
+    /**
+     * Enum representing register names.
+     */
     public enum RegisterNameImpl implements RegisterName {
         AX, BX, CX, DX, SP, BP;
     }
 
+    /**
+     * Constructs a new Registers object and initialises register values to 0.
+     */
     public Registers() {
         //TODO: In general, it is not recommended to call
         //      methods of the class in constructors.
@@ -30,11 +40,20 @@ public final class Registers {
         clear();
     }
 
+    /**
+     * Set all register values to 0.
+     */
     public void clear() {
         for (RegisterNameImpl register : RegisterNameImpl.values())
             registers.put(register, 0);
     }
 
+    /**
+     * Parses a register name from a string.
+     *
+     * @param s the string representing a register name
+     * @return an optional containing the parsed register name, or empty if not found
+     */
     public Optional<RegisterName> parseRegisterName(String s) {
         return Stream.of(RegisterNameImpl.values())
                 .filter(r -> r.name().equals(s))
@@ -42,6 +61,9 @@ public final class Registers {
                 //      (r is mapped to r).
                 //      What is the purpose of the next line of code?
                 //      Write a short explanation.
+                // The method must return an Optional<RegisterName> type, but the filter stream only streams objects of type <RegisterNameImpl>
+                // the <> before the .map() call tells the compiler that the elements in the stream should be treated as <RegisterName> objects after the mapping operation.
+                // therefore there is no change to the element r itself (r->r), only its type is treated as <RegisterName>
                 .<RegisterName>map(r -> r)
                 .findAny();
     }

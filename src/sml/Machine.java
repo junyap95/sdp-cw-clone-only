@@ -23,6 +23,9 @@ public final class Machine {
 
     private final Registers registers;
 
+    // The machine also has memory, which consists of 32-bit cells,
+    // each referred to by an address: the first cell has address 0,
+    // the second cell has address 1, etc.
     private final Memory memory;
 
     private final Flags flags;
