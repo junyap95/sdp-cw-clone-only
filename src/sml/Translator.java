@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 
-import static sml.Registers.RegisterNameImpl.AX;
 
 /**
  * This class ....
