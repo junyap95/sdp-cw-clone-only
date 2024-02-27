@@ -14,6 +14,8 @@ public class MulInstruction extends InstructionWithSourceOnly {
 
     @Override
     public int execute(Machine m) {
+        // Cast values obtained from register AX and source to long (64 bits) and perform multiplication
+        // Use shift operator on result to obtain its upper 32 bits and store it in register DX with int casting
         Registers registers = m.getRegisters();
         long valueAX = m.getRegisters().get(AX);
         long valueCX = source.getValue();

@@ -72,60 +72,65 @@ public final class Translator {
             return null;
 
         String opcode = scan(false);
-        switch (opcode) {
-            case MovInstruction.OP_CODE -> {
-                String d = scan(true);
-                String s = scan(false);
-                return new MovInstruction(label, getDestination(d, machine), getSource(s, machine));
-            }
+                switch (opcode) {
+                    case MovInstruction.OP_CODE -> {
+                        String d = scan(true);
+                        String s = scan(false);
+                        return new MovInstruction(label, getDestination(d, machine), getSource(s, machine));
+                    }
 
-            case MulInstruction.OP_CODE -> {
-                String d = scan(false);
-                return new MulInstruction(label, getSource(d, machine));
-            }
+                    case AddInstruction.OP_CODE -> {
+                        String d = scan(true);
+                        String s = scan(false);
+                        return new AddInstruction(label, getDestination(d, machine), getSource(s, machine));
+                    }
 
-            case AddInstruction.OP_CODE -> {
-                String d = scan(true);
-                String s = scan(false);
-                return new AddInstruction(label, getDestination(d, machine), getSource(s, machine));
-            }
+                    case SubInstruction.OP_CODE -> {
+                        String d = scan(true);
+                        String s = scan(false);
+                        return new SubInstruction(label, getDestination(d, machine), getSource(s, machine));
+                    }
 
-            case SubInstruction.OP_CODE -> {
-                String d = scan(true);
-                String s = scan(false);
-                return new SubInstruction(label, getDestination(d, machine), getSource(s, machine));
-            }
+                    case CmpInstruction.OP_CODE -> {
+                        String d = scan(true);
+                        String s = scan(false);
+                        return new CmpInstruction(label, getDestination(d, machine), getSource(s, machine));
+                    }
 
-            case CmpInstruction.OP_CODE -> {
-                String d = scan(true);
-                String s = scan(false);
-                return new CmpInstruction(label, getDestination(d, machine), getSource(s, machine));
-            }
+                    case MulInstruction.OP_CODE -> {
+                        String s = scan(false);
+                        return new MulInstruction(label, getSource(s, machine));
+                    }
 
-            case JgeInstruction.OP_CODE -> {
-                String d = scan(false);
-                return new JgeInstruction(label, d);
-            }
+                    case DivInstruction.OP_CODE -> {
+                        String s = scan(false);
+                        return new DivInstruction(label, getSource(s, machine));
+                    }
 
-            case JleInstruction.OP_CODE -> {
-                String d = scan(false);
-                return new JleInstruction(label, d);
-            }
+                    case JgeInstruction.OP_CODE -> {
+                        String s = scan(false);
+                        return new JgeInstruction(label, s);
+                    }
 
-            case JneInstruction.OP_CODE -> {
-                String d = scan(false);
-                return new JneInstruction(label, d);
-            }
+                    case JleInstruction.OP_CODE -> {
+                        String s = scan(false);
+                        return new JleInstruction(label, s);
+                    }
 
-            // TODO: add code for all other types of instructions
+                    case JneInstruction.OP_CODE -> {
+                        String s = scan(false);
+                        return new JneInstruction(label, s);
+                    }
 
-            // TODO: Then, replace the switch by using the Reflection API
+                    // TODO: add code for all other types of instructions
 
-            // TODO: Next, use dependency injection to allow this machine class
-            //       to work with different sets of opcodes (different CPUs)
+                    // TODO: Then, replace the switch by using the Reflection API
 
-            default -> System.out.println("Unknown instruction: " + opcode);
-        }
+                    // TODO: Next, use dependency injection to allow this machine class
+                    //       to work with different sets of opcodes (different CPUs)
+
+                    default -> System.out.println("Unknown instruction: " + opcode);
+                }
         return null;
     }
 

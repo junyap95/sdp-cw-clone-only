@@ -14,7 +14,7 @@ public class AddInstruction extends InstructionWithDestAndSrc {
 
     @Override
     public int execute(Machine m) {
-        int value = source.getValue(); // 1
+        int value = source.getValue();
         int res = destination.getValue();
         destination.setValue(res + value);
         return getSize();
