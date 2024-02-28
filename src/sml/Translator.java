@@ -1,13 +1,12 @@
 package sml;
 
-import sml.instruction.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 
 /**
@@ -48,13 +47,31 @@ public final class Translator {
 
                 Instruction instruction = getInstruction(label, machine);
                 if (instruction != null) {
-                    if (label != null)
-                        labels.addLabel(label, programCounter);
+                    if (label != null) labels.addLabel(label, programCounter);
                     program.put(programCounter, instruction);
                     programCounter += instruction.getSize();
                 }
             }
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private Class<?> classSupplier (String opcode) {
+        Properties properties = new Properties();
+        try{
+            try (var fis = Translator.class.getResourceAsStream("/beans.properties")) {
+                properties.load(fis);
+            }
+            // Obtain fully qualified class name from properties file
+            String clazz = properties.getProperty(opcode);
+
+            return Class.forName(clazz);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        // TODO: throw exception
+        return null;
     }
 
     /**
@@ -66,94 +83,105 @@ public final class Translator {
      * The input line should consist of a single SML instruction,
      * with its label already removed.
      */
-    private Instruction getInstruction(String label, Machine machine) {
-        if (line.isEmpty())
-            return null;
+    private Instruction getInstruction(String label, Machine machine) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        if (line.isEmpty()) return null;
 
         String opcode = scan(false);
-                switch (opcode) {
-                    case MovInstruction.OP_CODE -> {
-                        String d = scan(true);
-                        String s = scan(false);
-                        return new MovInstruction(label, getDestination(d, machine), getSource(s, machine));
-                    }
+        Class<?> instructionClass = classSupplier(opcode);
+        for(Constructor<?> constructor : instructionClass.getConstructors()) {
+            List<Object> parameterObjs = new ArrayList<>();
 
-                    case AddInstruction.OP_CODE -> {
-                        String d = scan(true);
-                        String s = scan(false);
-                        return new AddInstruction(label, getDestination(d, machine), getSource(s, machine));
-                    }
+            // add label beforehand, all instructions take label as 1st arg
+            parameterObjs.add(label);
+            System.out.println(Arrays.toString(constructor.getParameterTypes()));
 
-                    case SubInstruction.OP_CODE -> {
-                        String d = scan(true);
-                        String s = scan(false);
-                        return new SubInstruction(label, getDestination(d, machine), getSource(s, machine));
-                    }
-
-                    case CmpInstruction.OP_CODE -> {
-                        String d = scan(true);
-                        String s = scan(false);
-                        return new CmpInstruction(label, getDestination(d, machine), getSource(s, machine));
-                    }
-
-                    case MulInstruction.OP_CODE -> {
-                        String s = scan(false);
-                        return new MulInstruction(label, getSource(s, machine));
-                    }
-
-                    case DivInstruction.OP_CODE -> {
-                        String s = scan(false);
-                        return new DivInstruction(label, getSource(s, machine));
-                    }
-
-                    case JgeInstruction.OP_CODE -> {
-                        String s = scan(false);
-                        return new JgeInstruction(label, s);
-                    }
-
-                    case JleInstruction.OP_CODE -> {
-                        String s = scan(false);
-                        return new JleInstruction(label, s);
-                    }
-
-                    case JneInstruction.OP_CODE -> {
-                        String s = scan(false);
-                        return new JneInstruction(label, s);
-                    }
-
-                    // TODO: add code for all other types of instructions
-
-                    // TODO: Then, replace the switch by using the Reflection API
-
-                    // TODO: Next, use dependency injection to allow this machine class
-                    //       to work with different sets of opcodes (different CPUs)
-
-                    default -> System.out.println("Unknown instruction: " + opcode);
+            for(int i = 1; i < constructor.getParameterTypes().length; i++) {
+                Class<?> param = constructor.getParameterTypes()[i];
+                if (param.equals(InstructionDestination.class)) {
+                    parameterObjs.add(getDestination(scan(true), machine));
+                } else if (param.equals(InstructionSource.class)) {
+                    parameterObjs.add(getSource(scan(false), machine));
+                } else {
+                    parameterObjs.add(scan(false));
                 }
+            }
+
+            return (Instruction) constructor.newInstance(parameterObjs.toArray());
+        }
+
+//        switch (opcode) {
+//            case MovInstruction.OP_CODE -> {
+//                String d = scan(true);
+//                String s = scan(false);
+//                return new MovInstruction(label, getDestination(d, machine), getSource(s, machine));
+//            }
+//
+//            case AddInstruction.OP_CODE -> {
+//                String d = scan(true);
+//                String s = scan(false);
+//                return new AddInstruction(label, getDestination(d, machine), getSource(s, machine));
+//            }
+//
+//            case SubInstruction.OP_CODE -> {
+//                String d = scan(true);
+//                String s = scan(false);
+//                return new SubInstruction(label, getDestination(d, machine), getSource(s, machine));
+//            }
+//
+//            case CmpInstruction.OP_CODE -> {
+//                String d = scan(true);
+//                String s = scan(false);
+//                return new CmpInstruction(label, getDestination(d, machine), getSource(s, machine));
+//            }
+//
+//            case MulInstruction.OP_CODE -> {
+//                String s = scan(false);
+//                return new MulInstruction(label, getSource(s, machine));
+//            }
+//
+//            case DivInstruction.OP_CODE -> {
+//                String s = scan(false);
+//                return new DivInstruction(label, getSource(s, machine));
+//            }
+//
+//            case JgeInstruction.OP_CODE -> {
+//                String s = scan(false);
+//                return new JgeInstruction(label, s);
+//            }
+//
+//            case JleInstruction.OP_CODE -> {
+//                String s = scan(false);
+//                return new JleInstruction(label, s);
+//            }
+//
+//            case JneInstruction.OP_CODE -> {
+//                String s = scan(false);
+//                return new JneInstruction(label, s);
+//            }
+//
+//            // TODO: add code for all other types of instructions
+//
+//            // TODO: Then, replace the switch by using the Reflection API
+//
+//            // TODO: Next, use dependency injection to allow this machine class
+//            //       to work with different sets of opcodes (different CPUs)
+//
+//            default -> System.out.println("Unknown instruction: " + opcode);
+//        }
         return null;
     }
 
     private InstructionSource getSource(String s, Machine machine) {
-        return Optional.<InstructionSource>empty()
-                .or(() -> OperandImmediate.parseOperandImmediate(s))
-                .or(() -> OperandMemory.parseOperandMemory(s, machine.getMemory()))
-                .or(() -> OperandMemoryWithBase.parseOperandMemoryWithBase(s, machine.getMemory(), machine.getRegisters()))
-                .or(() -> OperandRegister.parseOperandRegister(s, machine.getRegisters()))
-                .orElseThrow(() -> new IllegalArgumentException("invalid instruction source: " + s));
+        return Optional.<InstructionSource>empty().or(() -> OperandImmediate.parseOperandImmediate(s)).or(() -> OperandMemory.parseOperandMemory(s, machine.getMemory())).or(() -> OperandMemoryWithBase.parseOperandMemoryWithBase(s, machine.getMemory(), machine.getRegisters())).or(() -> OperandRegister.parseOperandRegister(s, machine.getRegisters())).orElseThrow(() -> new IllegalArgumentException("invalid instruction source: " + s));
     }
 
     private InstructionDestination getDestination(String s, Machine machine) {
-        return Optional.<InstructionDestination>empty()
-                .or(() -> OperandMemory.parseOperandMemory(s, machine.getMemory()))
-                .or(() -> OperandMemoryWithBase.parseOperandMemoryWithBase(s, machine.getMemory(), machine.getRegisters()))
-                .or(() -> OperandRegister.parseOperandRegister(s, machine.getRegisters()))
-                .orElseThrow(() -> new IllegalArgumentException("invalid instruction destination: " + s));
+        return Optional.<InstructionDestination>empty().or(() -> OperandMemory.parseOperandMemory(s, machine.getMemory())).or(() -> OperandMemoryWithBase.parseOperandMemoryWithBase(s, machine.getMemory(), machine.getRegisters())).or(() -> OperandRegister.parseOperandRegister(s, machine.getRegisters())).orElseThrow(() -> new IllegalArgumentException("invalid instruction destination: " + s));
     }
 
     private String getLabel() {
         String word = scan(false);
-        if (word.endsWith(":"))
-            return word.substring(0, word.length() - 1);
+        if (word.endsWith(":")) return word.substring(0, word.length() - 1);
 
         // undo scanning the word
         line = word + " " + line;
@@ -171,16 +199,14 @@ public final class Translator {
 
         int whiteSpacePosition = 0;
         while (whiteSpacePosition < line.length()) {
-            if (Character.isWhitespace(line.charAt(whiteSpacePosition)))
-                break;
+            if (Character.isWhitespace(line.charAt(whiteSpacePosition))) break;
             whiteSpacePosition++;
         }
 
         String word = line.substring(0, whiteSpacePosition);
         line = line.substring(whiteSpacePosition);
         if (comma) {
-            if (word.endsWith(","))
-                return word.substring(0, word.length() - 1);
+            if (word.endsWith(",")) return word.substring(0, word.length() - 1);
             throw new IllegalArgumentException("Expected a comma after " + word);
         }
         return word;
