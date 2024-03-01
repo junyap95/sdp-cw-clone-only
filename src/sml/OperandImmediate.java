@@ -1,5 +1,6 @@
 package sml;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -34,5 +35,15 @@ public class OperandImmediate implements InstructionSource {
         return String.valueOf(value);
     }
 
-    //TODO: implement methods .equals and .hashCode
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        OperandImmediate that = (OperandImmediate) object;
+        return value == that.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
 }

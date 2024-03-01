@@ -1,11 +1,10 @@
 package sml;
 
-// TODO: write a JavaDoc for the class
-
 /**
  * Represents an abstract instruction.
- *
- * @author ...
+ * An instance that extends this class will inherit
+ *      - label
+ *      - opcode
  */
 public abstract class Instruction {
     protected final String label;
@@ -39,21 +38,16 @@ public abstract class Instruction {
      * @param machine the machine the instruction runs on
      * @return the new program counter
      */
-
     public abstract int execute(Machine machine);
 
     protected String getLabelString() {
         return (getLabel() == null) ? "" : getLabel() + ": ";
     }
 
-    // TODO: What exactly is the meaning of abstract in the declaration below?
-    //       Note that the method is declared in the superclass.
-    //       (Write a short explanation.)
-    // It means that the toString method will have to be implemented by the subclass of this abstract class
+    // Abstract keyword here  means that the toString method must be implemented by the subclass of this abstract class
     @Override
     public abstract String toString();
 
-    // TODO: Make sure that subclasses also implement equals and hashCode (needed in class Machine).
     @Override
     public abstract boolean equals(Object obj);
 

@@ -1,5 +1,6 @@
 package sml;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -42,5 +43,15 @@ public class OperandMemory implements InstructionSource, InstructionDestination 
         return "[" + address + "]";
     }
 
-    // TODO: implement methods .equals and .hashCode
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        OperandMemory that = (OperandMemory) object;
+        return address == that.address && Objects.equals(memory, that.memory);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(address, memory);
+    }
 }

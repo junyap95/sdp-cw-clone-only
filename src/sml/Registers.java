@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO: write a JavaDoc for the class
 
 /**
  * Represents a set of registers with associated values.
@@ -21,22 +20,18 @@ public final class Registers {
      * Enum representing register names.
      */
     public enum RegisterNameImpl implements RegisterName {
-        AX, BX, CX, DX, SP, BP;
+        AX, BX, CX, DX, SP, BP
     }
 
     /**
      * Constructs a new Registers object and initialises register values to 0.
      */
     public Registers() {
-        //TODO: In general, it is not recommended to call
-        //      methods of the class in constructors.
-        //      Why is it? And why is it safe in this case?
-        //      Write a short explanation.
-        // It is not recommended because if there is a subclass that extends this class it will make the subclass object creation inconsistent
-        // If that method can be overridden, it will make the superclass constructor inconsistent
-        // Complex processing in constructor is known to have a negative impact on testability.
-        // It is safe in this case because Registers is a final class which cannot be extended by other subclasses
-        // It also fits the logic of this class because a when a new Registers class is instantiated, it has to initialise the hashmap that contains 6 registers of value 0
+        // It is generally not recommended to call methods here because constructors should focus on initialising the object's attributes, not processing.
+        // Complex processing in constructor might have a negative impact on testability due to complex/ tightly coupled elements.
+        // It is safe in this case because Registers is a final class which cannot be extended by other subclasses, reducing the risk of subclass instance creation inconsistency.
+        // The logic of initialising the hashmap containing 6 registers with a value of 0 fits within the purpose of the class, which is what the clear() method is doing.
+        // As long as the constructor logic remains simple and focused on initialising the object's state, it is acceptable in this context.
         clear();
     }
 
@@ -57,13 +52,9 @@ public final class Registers {
     public Optional<RegisterName> parseRegisterName(String s) {
         return Stream.of(RegisterNameImpl.values())
                 .filter(r -> r.name().equals(s))
-                //TODO: The next line of code does not seem to do much
-                //      (r is mapped to r).
-                //      What is the purpose of the next line of code?
-                //      Write a short explanation.
-                // The method must return an Optional<RegisterName> type, but the filter stream only streams objects of type <RegisterNameImpl>
-                // the <> before the .map() call tells the compiler that the elements in the stream should be treated as <RegisterName> objects after the mapping operation.
-                // therefore there is no change to the element r itself (r->r), only its type is treated as <RegisterName>
+                // The method must return an Optional<RegisterName> type, but the filter stream only streams objects of type <RegisterNameImpl>.
+                // The <> before the .map() call tells the compiler that the elements in the stream should be treated as <RegisterName> objects after the mapping operation.
+                // Therefore, there is no change to the element r itself (r->r), only its type is treated as <RegisterName>.
                 .<RegisterName>map(r -> r)
                 .findAny();
     }
@@ -85,17 +76,15 @@ public final class Registers {
      * @return value
      */
     public int get(RegisterName register) {
-        //TODO: Explain what happens if register is not an instance of RegisterName.
-        //      Consider, for example, a call of the form registers.get(() -> "NEW").
+        // If register is not an instance of RegisterName, the casting of it to RegisterNameImpl will generate a ClassCastException
+        // A call of the form of registers.get(() -> "NEW") is a lambda expression used on a functional interface RegisterName that returns a String "NEW"
+        // The string cannot be cast into RegisterNameImpl as String is not a supertype of RegisterNameImpl.
         return registers.get((RegisterNameImpl)register);
     }
 
-    // TODO: use pattern matching for instanceof
-    // https://docs.oracle.com/en/java/javase/14/language/pattern-matching-instanceof-operator.html
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Registers) {
-            Registers other = (Registers) o;
+        if (o instanceof Registers other) {
             return registers.equals(other.registers);
         }
         return false;

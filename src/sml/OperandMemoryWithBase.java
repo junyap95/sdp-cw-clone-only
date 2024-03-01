@@ -1,5 +1,6 @@
 package sml;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,5 +57,15 @@ public class OperandMemoryWithBase implements InstructionSource, InstructionDest
         return "[" + base + " + " + offset + "]";
     }
 
-    //TODO: implement methods .equals and .hashCode
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        OperandMemoryWithBase that = (OperandMemoryWithBase) object;
+        return offset == that.offset && Objects.equals(memory, that.memory) && Objects.equals(base, that.base) && Objects.equals(registers, that.registers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(offset, memory, base, registers);
+    }
 }

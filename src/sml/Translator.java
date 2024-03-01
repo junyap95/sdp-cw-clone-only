@@ -1,6 +1,5 @@
 package sml;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -10,11 +9,11 @@ import java.util.*;
 
 
 /**
- * This class ....
+ * This class reads the lines from a .sml file and interprets them as individual instructions,
+ * and then store the information in the machine
  * <p>
  * The translator of a <b>S</b><b>M</b>al<b>L</b> program.
  *
- * @author ...
  */
 public final class Translator {
 
@@ -67,10 +66,11 @@ public final class Translator {
             String clazz = properties.getProperty(opcode);
 
             return Class.forName(clazz);
-        } catch(Exception ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Error loading properties file: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.err.println("Class not found: " + e.getMessage());
         }
-        // TODO: throw exception
         return null;
     }
 
@@ -85,89 +85,30 @@ public final class Translator {
      */
     private Instruction getInstruction(String label, Machine machine) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (line.isEmpty()) return null;
-
         String opcode = scan(false);
         Class<?> instructionClass = classSupplier(opcode);
-        for(Constructor<?> constructor : instructionClass.getConstructors()) {
-            List<Object> parameterObjs = new ArrayList<>();
+        if (instructionClass != null) {
+            for (Constructor<?> constructor : instructionClass.getConstructors()) {
+                List<Object> parameterObjs = new ArrayList<>();
 
-            // add label beforehand, all instructions take label as 1st arg
-            parameterObjs.add(label);
-            System.out.println(Arrays.toString(constructor.getParameterTypes()));
+                // add label beforehand, all instructions take label as 1st arg
+                parameterObjs.add(label);
 
-            for(int i = 1; i < constructor.getParameterTypes().length; i++) {
-                Class<?> param = constructor.getParameterTypes()[i];
-                if (param.equals(InstructionDestination.class)) {
-                    parameterObjs.add(getDestination(scan(true), machine));
-                } else if (param.equals(InstructionSource.class)) {
-                    parameterObjs.add(getSource(scan(false), machine));
-                } else {
-                    parameterObjs.add(scan(false));
+                for (int i = 1; i < constructor.getParameterTypes().length; i++) {
+                    Class<?> param = constructor.getParameterTypes()[i];
+                    if (param.equals(InstructionDestination.class)) {
+                        parameterObjs.add(getDestination(scan(true), machine));
+                    } else if (param.equals(InstructionSource.class)) {
+                        parameterObjs.add(getSource(scan(false), machine));
+                    } else {
+                        parameterObjs.add(scan(false));
+                    }
                 }
-            }
 
-            return (Instruction) constructor.newInstance(parameterObjs.toArray());
+                return (Instruction) constructor.newInstance(parameterObjs.toArray());
+            }
         }
 
-//        switch (opcode) {
-//            case MovInstruction.OP_CODE -> {
-//                String d = scan(true);
-//                String s = scan(false);
-//                return new MovInstruction(label, getDestination(d, machine), getSource(s, machine));
-//            }
-//
-//            case AddInstruction.OP_CODE -> {
-//                String d = scan(true);
-//                String s = scan(false);
-//                return new AddInstruction(label, getDestination(d, machine), getSource(s, machine));
-//            }
-//
-//            case SubInstruction.OP_CODE -> {
-//                String d = scan(true);
-//                String s = scan(false);
-//                return new SubInstruction(label, getDestination(d, machine), getSource(s, machine));
-//            }
-//
-//            case CmpInstruction.OP_CODE -> {
-//                String d = scan(true);
-//                String s = scan(false);
-//                return new CmpInstruction(label, getDestination(d, machine), getSource(s, machine));
-//            }
-//
-//            case MulInstruction.OP_CODE -> {
-//                String s = scan(false);
-//                return new MulInstruction(label, getSource(s, machine));
-//            }
-//
-//            case DivInstruction.OP_CODE -> {
-//                String s = scan(false);
-//                return new DivInstruction(label, getSource(s, machine));
-//            }
-//
-//            case JgeInstruction.OP_CODE -> {
-//                String s = scan(false);
-//                return new JgeInstruction(label, s);
-//            }
-//
-//            case JleInstruction.OP_CODE -> {
-//                String s = scan(false);
-//                return new JleInstruction(label, s);
-//            }
-//
-//            case JneInstruction.OP_CODE -> {
-//                String s = scan(false);
-//                return new JneInstruction(label, s);
-//            }
-//
-//            // TODO: add code for all other types of instructions
-//
-//            // TODO: Then, replace the switch by using the Reflection API
-//
-//            // TODO: Next, use dependency injection to allow this machine class
-//            //       to work with different sets of opcodes (different CPUs)
-//
-//            default -> System.out.println("Unknown instruction: " + opcode);
-//        }
         return null;
     }
 
