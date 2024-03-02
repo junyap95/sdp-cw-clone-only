@@ -3,17 +3,9 @@ package test.instruction;
 import org.junit.jupiter.api.Test;
 import sml.Instruction;
 import sml.Machine;
-import sml.OperandImmediate;
-import sml.OperandRegister;
-import sml.instruction.CmpInstruction;
 import sml.instruction.JneInstruction;
-import sml.instruction.MulInstruction;
-
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static sml.Registers.RegisterNameImpl.AX;
-import static sml.Registers.RegisterNameImpl.CX;
+
 
 class JneInstructionTest {
 

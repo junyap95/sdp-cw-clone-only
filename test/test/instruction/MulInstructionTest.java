@@ -3,7 +3,6 @@ package test.instruction;
 import org.junit.jupiter.api.Test;
 import sml.*;
 import sml.instruction.MulInstruction;
-import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 import static sml.Registers.RegisterNameImpl.*;
 
