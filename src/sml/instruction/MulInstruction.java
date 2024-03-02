@@ -8,8 +8,8 @@ import static sml.Registers.RegisterNameImpl.DX;
 public class MulInstruction extends InstructionWithSourceOnly {
     public static final String OP_CODE = "mul";
 
-    public MulInstruction(String label, InstructionSource source) {
-        super(label, OP_CODE, source);
+    public MulInstruction(String label, String line, InstructionArgsFactory instructionArgsFactory) {
+        super(label, OP_CODE, line, instructionArgsFactory);
     }
 
     @Override

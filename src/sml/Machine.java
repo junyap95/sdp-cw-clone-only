@@ -34,6 +34,7 @@ public final class Machine {
     // of the next instruction to be executed.
     private int programCounter = 0;
 
+
     public Machine(int memorySize) {
         this.registers = new Registers();
         this.flags = new Flags();
@@ -45,6 +46,7 @@ public final class Machine {
      * Precondition: the program and its labels have been stored properly.
      */
     public void execute() {
+        System.out.println(memory);
         programCounter = 0;
         registers.clear();
         int programSize = program.values().stream().mapToInt(Instruction::getSize).sum();

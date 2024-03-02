@@ -1,12 +1,14 @@
 package sml.instruction;
 
+import sml.InstructionArgsFactory;
 import sml.Machine;
 
 public class JneInstruction extends InstructionWithAddress {
     public static final String OP_CODE = "jne";
 
-    public JneInstruction(String label, String address) {
-        super(label, OP_CODE, address);
+    public JneInstruction(String label, String line, InstructionArgsFactory instructionArgsFactory) {
+        super(label, OP_CODE, line, instructionArgsFactory);
+
     }
 
     @Override

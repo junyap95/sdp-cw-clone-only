@@ -1,6 +1,6 @@
 package sml.instruction;
 
-import sml.InstructionSource;
+import sml.InstructionArgsFactory;
 import sml.Machine;
 import sml.Registers;
 
@@ -10,8 +10,8 @@ import static sml.Registers.RegisterNameImpl.DX;
 public class DivInstruction extends InstructionWithSourceOnly{
     public static final String OP_CODE = "div";
 
-    public DivInstruction(String label, InstructionSource source) {
-        super(label, OP_CODE, source);
+    public DivInstruction(String label, String line, InstructionArgsFactory instructionArgsFactory) {
+        super(label, OP_CODE, line, instructionArgsFactory);
     }
 
     @Override

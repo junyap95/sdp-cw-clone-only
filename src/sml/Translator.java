@@ -1,12 +1,14 @@
 package sml;
 
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static sml.InstructionArgsFactory.getInstructionFactory;
 
 /**
  * This class reads the lines from a .sml file and interprets them as individual instructions,
@@ -56,24 +58,6 @@ public final class Translator {
         }
     }
 
-    private Class<?> classSupplier (String opcode) {
-        Properties properties = new Properties();
-        try{
-            try (var fis = Translator.class.getResourceAsStream("/beans.properties")) {
-                properties.load(fis);
-            }
-            // Obtain fully qualified class name from properties file
-            String clazz = properties.getProperty(opcode);
-
-            return Class.forName(clazz);
-        } catch (IOException e) {
-            System.err.println("Error loading properties file: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            System.err.println("Class not found: " + e.getMessage());
-        }
-        return null;
-    }
-
     /**
      * Translates the current line into an instruction with the given label
      *
@@ -85,44 +69,13 @@ public final class Translator {
      */
     private Instruction getInstruction(String label, Machine machine) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (line.isEmpty()) return null;
-
-        String opcode = scan(false);
-        Class<?> instructionClass = classSupplier(opcode);
-        if (instructionClass != null) {
-            for (Constructor<?> constructor : instructionClass.getConstructors()) {
-                List<Object> parameterObjs = new ArrayList<>();
-
-                // add label beforehand, all instructions take label as 1st arg
-                parameterObjs.add(label);
-
-                for (int i = 1; i < constructor.getParameterTypes().length; i++) {
-                    Class<?> param = constructor.getParameterTypes()[i];
-                    if (param.equals(InstructionDestination.class)) {
-                        parameterObjs.add(getDestination(scan(true), machine));
-                    } else if (param.equals(InstructionSource.class)) {
-                        parameterObjs.add(getSource(scan(false), machine));
-                    } else {
-                        parameterObjs.add(scan(false));
-                    }
-                }
-
-                return (Instruction) constructor.newInstance(parameterObjs.toArray());
-            }
-        }
-
-        return null;
-    }
-
-    private InstructionSource getSource(String s, Machine machine) {
-        return Optional.<InstructionSource>empty().or(() -> OperandImmediate.parseOperandImmediate(s)).or(() -> OperandMemory.parseOperandMemory(s, machine.getMemory())).or(() -> OperandMemoryWithBase.parseOperandMemoryWithBase(s, machine.getMemory(), machine.getRegisters())).or(() -> OperandRegister.parseOperandRegister(s, machine.getRegisters())).orElseThrow(() -> new IllegalArgumentException("invalid instruction source: " + s));
-    }
-
-    private InstructionDestination getDestination(String s, Machine machine) {
-        return Optional.<InstructionDestination>empty().or(() -> OperandMemory.parseOperandMemory(s, machine.getMemory())).or(() -> OperandMemoryWithBase.parseOperandMemoryWithBase(s, machine.getMemory(), machine.getRegisters())).or(() -> OperandRegister.parseOperandRegister(s, machine.getRegisters())).orElseThrow(() -> new IllegalArgumentException("invalid instruction destination: " + s));
+        String opcode = scan();
+        var context = new ClassPathXmlApplicationContext("/beans.xml");
+        return (Instruction) context.getBean(opcode, label, this.line, getInstructionFactory(machine));
     }
 
     private String getLabel() {
-        String word = scan(false);
+        String word = scan();
         if (word.endsWith(":")) return word.substring(0, word.length() - 1);
 
         // undo scanning the word
@@ -134,9 +87,8 @@ public final class Translator {
      * Return the first word of line and remove it from line.
      * If there is no word, return "".
      *
-     * @param comma remove the trailing comma if set to true
      */
-    private String scan(boolean comma) {
+    private String scan() {
         line = line.trim();
 
         int whiteSpacePosition = 0;
@@ -147,10 +99,8 @@ public final class Translator {
 
         String word = line.substring(0, whiteSpacePosition);
         line = line.substring(whiteSpacePosition);
-        if (comma) {
-            if (word.endsWith(",")) return word.substring(0, word.length() - 1);
-            throw new IllegalArgumentException("Expected a comma after " + word);
-        }
+
         return word;
     }
 }
+

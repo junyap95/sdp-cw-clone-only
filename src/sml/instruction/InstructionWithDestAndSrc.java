@@ -2,6 +2,7 @@ package sml.instruction;
 
 import sml.Instruction;
 import sml.InstructionDestination;
+import sml.InstructionArgsFactory;
 import sml.InstructionSource;
 import java.util.Objects;
 
@@ -14,16 +15,10 @@ public abstract class InstructionWithDestAndSrc extends Instruction {
     protected final InstructionDestination destination;
     protected final InstructionSource source;
 
-    /**
-     * Constructor: an instruction with a destination and source
-     *
-     * @param destination The destination operand of the instruction.
-     * @param source      The source operand of the instruction.
-     */
-    public InstructionWithDestAndSrc(String label, String opcode, InstructionDestination destination, InstructionSource source) {
+    public InstructionWithDestAndSrc(String label, String opcode, String line, InstructionArgsFactory instructionArgsFactory) {
         super(label, opcode);
-        this.destination = destination;
-        this.source = source;
+        this.destination = instructionArgsFactory.getInstructionDestination(line);
+        this.source = instructionArgsFactory.getInstructionSource(line);
     }
 
     @Override

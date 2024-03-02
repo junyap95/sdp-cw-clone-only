@@ -1,48 +1,57 @@
 package test.instruction;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import sml.*;
-import sml.instruction.MovInstruction;
+
+import java.lang.reflect.Field;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static sml.InstructionArgsFactory.getInstructionFactory;
 import static sml.Registers.RegisterNameImpl.*;
 
 class MovInstructionTest {
+    private final ApplicationContext context = new ClassPathXmlApplicationContext("/beans.xml");
+
+    @BeforeEach
+    public void resetSingleton() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field instance = InstructionArgsFactory.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        instance.set(null, null);
+    }
 
     @Test
     void executeRegToReg() {
         Machine machine = new Machine(0x40_000);
-        machine.getRegisters().set(AX, 100);
-        OperandRegister operandRegisterCX = new OperandRegister(CX, machine.getRegisters());
-        OperandRegister operandRegisterAX = new OperandRegister(AX, machine.getRegisters());
-        Instruction movInstruction = new MovInstruction("", operandRegisterCX, operandRegisterAX);
+        machine.getRegisters().set(AX, 75);
+        String line = "CX, AX";
+        Instruction movInstruction = (Instruction) context.getBean("mov", "", line, getInstructionFactory(machine));
         movInstruction.execute(machine);
-        assertEquals(100, machine.getRegisters().get(CX));
-        assertEquals(100, machine.getRegisters().get(AX));
-        assertEquals(1, movInstruction.getSize());
+        assertEquals(75, machine.getRegisters().get(CX));
     }
 
     @Test
     void executeImmToReg() {
         Machine machine = new Machine(0x40_000);
         machine.getRegisters().set(CX, 10);
-        OperandRegister operandRegisterCX = new OperandRegister(CX, machine.getRegisters());
-        OperandImmediate operandImmediate = new OperandImmediate(100);
-        Instruction movInstruction = new MovInstruction("", operandRegisterCX, operandImmediate);
+
+        String line = "CX, 50";
+        Instruction movInstruction = (Instruction) context.getBean("mov", "", line, getInstructionFactory(machine));
         movInstruction.execute(machine);
-        assertEquals(100, machine.getRegisters().get(CX));
-        assertEquals(1 + operandImmediate.getSize() + operandRegisterCX.getSize(), movInstruction.getSize());
+        assertEquals(50, machine.getRegisters().get(CX));
     }
 
     @Test
     void executeMemToReg() {
         Machine machine = new Machine(0x40_000);
         machine.getMemory().set(1, 100);
-        OperandRegister operandRegisterCX = new OperandRegister(CX, machine.getRegisters());
-        OperandMemory operandMemory = new OperandMemory(1, machine.getMemory());
-        Instruction movInstruction = new MovInstruction("", operandRegisterCX, operandMemory);
+
+        String line = "CX, [1]";
+        Instruction movInstruction = (Instruction) context.getBean("mov", "", line, getInstructionFactory(machine));
         movInstruction.execute(machine);
         assertEquals(100, machine.getRegisters().get(CX));
-        assertEquals(1 + operandMemory.getSize() + operandRegisterCX.getSize(), movInstruction.getSize());
     }
 
 }

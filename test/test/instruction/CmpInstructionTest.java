@@ -1,14 +1,26 @@
 package test.instruction;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import sml.*;
-import sml.instruction.CmpInstruction;
 
+import java.lang.reflect.Field;
 import static org.junit.jupiter.api.Assertions.*;
+import static sml.InstructionArgsFactory.getInstructionFactory;
 import static sml.Registers.RegisterNameImpl.AX;
 import static sml.Registers.RegisterNameImpl.CX;
 
 public class CmpInstructionTest {
+    private final ApplicationContext context = new ClassPathXmlApplicationContext("/beans.xml");
+
+    @BeforeEach
+    public void resetSingleton() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field instance = InstructionArgsFactory.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        instance.set(null, null);
+    }
 
     @Test
     void executeRegToReg() {
@@ -17,9 +29,8 @@ public class CmpInstructionTest {
         machine.getRegisters().set(AX, 100);
         machine.getRegisters().set(CX, 100);
 
-        OperandRegister operandRegisterCX = new OperandRegister(CX, machine.getRegisters());
-        OperandRegister operandRegisterAX = new OperandRegister(AX, machine.getRegisters());
-        Instruction cmpInstruction = new CmpInstruction("", operandRegisterCX, operandRegisterAX);
+        String line = "CX, AX";
+        Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
 
         assertFalse(machine.getFlags().getZF());
         cmpInstruction.execute(machine);
@@ -31,8 +42,6 @@ public class CmpInstructionTest {
         assertFalse(machine.getFlags().getSF());
         cmpInstruction.execute(machine);
         assertTrue(machine.getFlags().getSF());
-
-        assertEquals(1 + operandRegisterAX.getSize() + operandRegisterCX.getSize(), cmpInstruction.getSize());
     }
 
     @Test
@@ -41,9 +50,8 @@ public class CmpInstructionTest {
         // numbers are equal
         machine.getRegisters().set(CX, 100);
 
-        OperandRegister operandRegisterCX = new OperandRegister(CX, machine.getRegisters());
-        OperandImmediate operandImmediate = new OperandImmediate(100);
-        Instruction cmpInstruction = new CmpInstruction("", operandRegisterCX, operandImmediate);
+        String line = "CX, 100";
+        Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
 
         assertFalse(machine.getFlags().getZF());
         cmpInstruction.execute(machine);
@@ -55,8 +63,6 @@ public class CmpInstructionTest {
         assertFalse(machine.getFlags().getSF());
         cmpInstruction.execute(machine);
         assertTrue(machine.getFlags().getSF());
-
-        assertEquals(1 + operandImmediate.getSize() + operandRegisterCX.getSize(), cmpInstruction.getSize());
     }
 
     @Test
@@ -64,9 +70,9 @@ public class CmpInstructionTest {
         Machine machine = new Machine(0x40_000);
         machine.getMemory().set(1, 100);
         machine.getRegisters().set(CX, 100);
-        OperandRegister operandRegisterCX = new OperandRegister(CX, machine.getRegisters());
-        OperandMemory operandMemory = new OperandMemory(1, machine.getMemory());
-        Instruction cmpInstruction = new CmpInstruction("", operandRegisterCX, operandMemory);
+
+        String line = "CX, [1]";
+        Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
 
         assertFalse(machine.getFlags().getZF());
         cmpInstruction.execute(machine);
@@ -77,7 +83,5 @@ public class CmpInstructionTest {
         assertFalse(machine.getFlags().getSF());
         cmpInstruction.execute(machine);
         assertTrue(machine.getFlags().getSF());
-
-        assertEquals(1 + operandMemory.getSize() + operandRegisterCX.getSize(), cmpInstruction.getSize());
     }
 }

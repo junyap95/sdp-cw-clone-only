@@ -5,8 +5,8 @@ import sml.*;
 public class JgeInstruction extends InstructionWithAddress {
     public static final String OP_CODE = "jge";
 
-    public JgeInstruction(String label, String address) {
-        super(label, OP_CODE, address);
+    public JgeInstruction(String label, String line, InstructionArgsFactory instructionArgsFactory) {
+        super(label, OP_CODE, line, instructionArgsFactory);
     }
 
     @Override

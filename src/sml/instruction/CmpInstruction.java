@@ -1,14 +1,13 @@
 package sml.instruction;
 
-import sml.InstructionDestination;
-import sml.InstructionSource;
+import sml.InstructionArgsFactory;
 import sml.Machine;
 
 public class CmpInstruction extends InstructionWithDestAndSrc {
     public static final String OP_CODE = "cmp";
 
-    public CmpInstruction(String label, InstructionDestination result, InstructionSource source) {
-        super(label, OP_CODE, result, source);
+    public CmpInstruction(String label, String line, InstructionArgsFactory instructionArgsFactory) {
+        super(label, OP_CODE, line, instructionArgsFactory);
     }
 
     @Override

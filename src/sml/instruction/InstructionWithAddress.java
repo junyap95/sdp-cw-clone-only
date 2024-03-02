@@ -1,6 +1,7 @@
 package sml.instruction;
 
 import sml.Instruction;
+import sml.InstructionArgsFactory;
 
 import java.util.Objects;
 
@@ -13,14 +14,9 @@ import java.util.Objects;
 public abstract class InstructionWithAddress extends Instruction {
     protected final String address;
 
-    /**
-     * Constructor: an instruction with an address
-     *
-     * @param address The memory address to jump to if the conditions are met.
-     */
-    public InstructionWithAddress(String label, String opcode, String address) {
+    public InstructionWithAddress(String label, String opcode, String line, InstructionArgsFactory instructionArgsFactory) {
         super(label, opcode);
-        this.address = address;
+        this.address = instructionArgsFactory.getInstructionAddress(line);
     }
 
     @Override

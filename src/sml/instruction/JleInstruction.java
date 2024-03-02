@@ -1,5 +1,6 @@
 package sml.instruction;
 
+import sml.InstructionArgsFactory;
 import sml.Machine;
 
 /**
@@ -13,8 +14,8 @@ import sml.Machine;
 public class JleInstruction extends InstructionWithAddress {
     public static final String OP_CODE = "jle";
 
-    public JleInstruction(String label, String address) {
-        super(label, OP_CODE, address);
+    public JleInstruction(String label, String line, InstructionArgsFactory instructionArgsFactory) {
+        super(label, OP_CODE, line, instructionArgsFactory);
     }
 
     @Override

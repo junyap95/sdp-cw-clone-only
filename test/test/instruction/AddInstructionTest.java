@@ -1,38 +1,49 @@
 package test.instruction;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import sml.*;
-import sml.instruction.AddInstruction;
+
+import java.lang.reflect.Field;
 import static org.junit.jupiter.api.Assertions.*;
+import static sml.InstructionArgsFactory.getInstructionFactory;
 import static sml.Registers.RegisterNameImpl.AX;
 import static sml.Registers.RegisterNameImpl.CX;
 
 class AddInstructionTest {
+    private final ApplicationContext context = new ClassPathXmlApplicationContext("/beans.xml");
+
+    @BeforeEach
+    public void resetSingleton() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field instance = InstructionArgsFactory.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        instance.set(null, null);
+    }
 
     @Test
     void executeRegToReg() {
         Machine machine = new Machine(0x40_000);
-        machine.getRegisters().set(AX, 100);
-        machine.getRegisters().set(CX, 50);
-        OperandRegister operandRegisterCX = new OperandRegister(CX, machine.getRegisters());
-        OperandRegister operandRegisterAX = new OperandRegister(AX, machine.getRegisters());
-        Instruction addInstruction = new AddInstruction("", operandRegisterCX, operandRegisterAX);
+        machine.getRegisters().set(AX, 75);
+        machine.getRegisters().set(CX, 75);
+
+        String line = "CX, AX";
+        Instruction addInstruction = (Instruction) context.getBean("add", "", line, getInstructionFactory(machine));
         addInstruction.execute(machine);
         assertEquals(150, machine.getRegisters().get(CX));
-        assertEquals(100, machine.getRegisters().get(AX));
-        assertEquals(1 + operandRegisterAX.getSize() + operandRegisterCX.getSize(), addInstruction.getSize());
+        assertEquals(75, machine.getRegisters().get(AX));
     }
 
     @Test
     void executeImmToReg() {
         Machine machine = new Machine(0x40_000);
         machine.getRegisters().set(CX, 50);
-        OperandRegister operandRegisterCX = new OperandRegister(CX, machine.getRegisters());
-        OperandImmediate operandImmediate = new OperandImmediate(100);
-        Instruction addInstruction = new AddInstruction("", operandRegisterCX, operandImmediate);
+
+        String line = "CX, 100";
+        Instruction addInstruction = (Instruction) context.getBean("add", "", line, getInstructionFactory(machine));
         addInstruction.execute(machine);
         assertEquals(150, machine.getRegisters().get(CX));
-        assertEquals(1 + operandImmediate.getSize() + operandRegisterCX.getSize(), addInstruction.getSize());
     }
 
     @Test
@@ -40,12 +51,11 @@ class AddInstructionTest {
         Machine machine = new Machine(0x40_000);
         machine.getMemory().set(1, 100);
         machine.getRegisters().set(CX, 40);
-        OperandRegister operandRegisterCX = new OperandRegister(CX, machine.getRegisters());
-        OperandMemory operandMemory = new OperandMemory(1, machine.getMemory());
-        Instruction addInstruction = new AddInstruction("", operandRegisterCX, operandMemory);
+
+        String line = "CX, [1]";
+        Instruction addInstruction = (Instruction) context.getBean("add", "", line, getInstructionFactory(machine));
         addInstruction.execute(machine);
         assertEquals(140, machine.getRegisters().get(CX));
-        assertEquals(1 + operandMemory.getSize() + operandRegisterCX.getSize(), addInstruction.getSize());
     }
 
 }

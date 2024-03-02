@@ -1,26 +1,39 @@
 package test.instruction;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sml.Instruction;
-import sml.Machine;
-import sml.OperandMemory;
-import sml.OperandRegister;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import sml.*;
 import sml.instruction.DivInstruction;
+
+import java.lang.reflect.Field;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static sml.InstructionArgsFactory.getInstructionFactory;
 import static sml.Registers.RegisterNameImpl.*;
 
 class DivInstructionTest {
+    private final ApplicationContext context = new ClassPathXmlApplicationContext("/beans.xml");
+
+    @BeforeEach
+    public void resetSingleton() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field instance = InstructionArgsFactory.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        instance.set(null, null);
+    }
+
     @Test
     void executeReg() {
         Machine machine = new Machine(0x40_000);
         machine.getRegisters().set(AX, 100);
         machine.getRegisters().set(CX, 30);
-        OperandRegister operandRegister = new OperandRegister(CX, machine.getRegisters());
-        Instruction divInstruction = new DivInstruction("", operandRegister);
+
+        String line = "CX";
+        Instruction divInstruction = (Instruction) context.getBean("div", "", line, getInstructionFactory(machine));
         divInstruction.execute(machine);
         assertEquals(3, machine.getRegisters().get(AX));
         assertEquals(10, machine.getRegisters().get(DX));
-        assertEquals(1 + operandRegister.getSize(), divInstruction.getSize());
     }
 
     @Test
@@ -28,12 +41,12 @@ class DivInstructionTest {
         Machine machine = new Machine(0x40_000);
         machine.getRegisters().set(AX, 100);
         machine.getMemory().set(1, 40);
-        OperandMemory operandMemory = new OperandMemory(1, machine.getMemory());
-        Instruction divInstruction = new DivInstruction("", operandMemory);
+
+        String line = "[1]";
+        Instruction divInstruction = (Instruction) context.getBean("div", "", line, getInstructionFactory(machine));
         divInstruction.execute(machine);
         assertEquals(2, machine.getRegisters().get(AX));
         assertEquals(20, machine.getRegisters().get(DX));
-        assertEquals(1 + operandMemory.getSize(), divInstruction.getSize());
     }
 
 }

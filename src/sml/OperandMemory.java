@@ -8,12 +8,13 @@ public class OperandMemory implements InstructionSource, InstructionDestination 
     private final int address;
     private final Memory memory;
 
-
-    private static final Pattern pattern = Pattern.compile("^[\\d+]$");
+    // updated regex, added '\\' in front of it to accept string like "[1]"
+    private static final Pattern pattern = Pattern.compile("^\\[\\d+]$");
 
     public static Optional<OperandMemory> parseOperandMemory(String s, Memory memory) {
-        if (pattern.matcher(s).find())
+        if (pattern.matcher(s).find()) {
             return Optional.of(new OperandMemory(Integer.parseInt(s.substring(1, s.length() - 1)), memory));
+        }
 
         return Optional.empty();
     }

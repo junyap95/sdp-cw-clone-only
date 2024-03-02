@@ -1,25 +1,21 @@
 package sml.instruction;
 
 import sml.Instruction;
+import sml.InstructionArgsFactory;
 import sml.InstructionSource;
 import java.util.Objects;
 
 /**
- * Represents an abstract class for instructions with both a destination and a source operand
+ * Represents an abstract class for instructions with a source operand
  * <p>
  * This class extends the {@link sml.Instruction} class and provides common functionality
  */
 public abstract class InstructionWithSourceOnly extends Instruction {
     protected final InstructionSource source;
 
-    /**
-     * Constructor: an instruction with a destination and source
-     *
-     * @param source The source operand of the instruction.
-     */
-    public InstructionWithSourceOnly(String label, String opcode, InstructionSource source) {
+    public InstructionWithSourceOnly(String label, String opcode, String line, InstructionArgsFactory instructionArgsFactory) {
         super(label, opcode);
-        this.source = source;
+        this.source = instructionArgsFactory.getInstructionSource(line);
     }
 
     @Override

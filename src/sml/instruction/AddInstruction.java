@@ -1,15 +1,14 @@
 package sml.instruction;
 
-import sml.InstructionDestination;
-import sml.InstructionSource;
+import sml.InstructionArgsFactory;
 import sml.Machine;
 
 public class AddInstruction extends InstructionWithDestAndSrc {
 
     public static final String OP_CODE = "add";
 
-    public AddInstruction(String label, InstructionDestination result, InstructionSource source) {
-        super(label, OP_CODE, result, source);
+    public AddInstruction(String label, String line, InstructionArgsFactory instructionArgsFactory) {
+        super(label, OP_CODE, line, instructionArgsFactory);
     }
 
     @Override
