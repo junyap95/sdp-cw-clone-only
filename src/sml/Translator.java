@@ -85,6 +85,7 @@ public final class Translator {
      */
     private Instruction getInstruction(String label, Machine machine) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (line.isEmpty()) return null;
+
         String opcode = scan(false);
         Class<?> instructionClass = classSupplier(opcode);
         if (instructionClass != null) {

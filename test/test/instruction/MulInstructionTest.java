@@ -10,16 +10,16 @@ import static sml.Registers.RegisterNameImpl.*;
 class MulInstructionTest {
 
     @Test
-    void execute() {
+    void executeSmallInteger() {
         Machine machine = new Machine(0x40_000);
         machine.getRegisters().set(AX, 100);
+        machine.getRegisters().set(CX, 2);
         OperandRegister operandRegister = new OperandRegister(CX, machine.getRegisters());
-        operandRegister.setValue(2);
         Instruction mulInstruction = new MulInstruction("", operandRegister);
         mulInstruction.execute(machine);
         assertEquals(200, machine.getRegisters().get(AX));
         assertEquals( 0, machine.getRegisters().get(DX));
-        assertEquals( 1, mulInstruction.getSize());
+        assertEquals(1 + operandRegister.getSize(), mulInstruction.getSize());
     }
 
     @Test
@@ -37,6 +37,6 @@ class MulInstructionTest {
         mulInstruction.execute(machine);
         assertEquals((int) (valueCX * valueAX), machine.getRegisters().get(AX));
         assertEquals(mulResultUpper, machine.getRegisters().get(DX));
-        assertEquals( 1, mulInstruction.getSize());
+        assertEquals(1 + operandRegister.getSize(), mulInstruction.getSize());
     }
 }
