@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="sml"/>
+
+    <bean id="mov" class="sml.instruction.MovInstruction" scope="prototype"/>
+    <bean id="mul" class="sml.instruction.MulInstruction" scope="prototype"/>
+    <bean id="div" class="sml.instruction.DivInstruction" scope="prototype"/>
+    <bean id="sub" class="sml.instruction.SubInstruction" scope="prototype"/>
+    <bean id="add" class="sml.instruction.AddInstruction" scope="prototype"/>
+    <bean id="cmp" class="sml.instruction.CmpInstruction" scope="prototype"/>
+    <bean id="jge" class="sml.instruction.JgeInstruction" scope="prototype"/>
+    <bean id="jne" class="sml.instruction.JneInstruction" scope="prototype"/>
+    <bean id="jle" class="sml.instruction.JleInstruction" scope="prototype"/>
+
+</beans>
