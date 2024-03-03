@@ -15,7 +15,7 @@ import static sml.Registers.RegisterNameImpl.CX;
 public class SubInstructionTest {
     private final ApplicationContext context = new ClassPathXmlApplicationContext("/beans.xml");
 
-    // code referred from: https://blog.davidehringer.com/testing/test-driven-development/unit-testing-singletons/
+    // Reference: https://blog.davidehringer.com/testing/test-driven-development/unit-testing-singletons/
     @BeforeEach
     public void resetSingleton() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         Field instance = InstructionArgsFactory.class.getDeclaredField("instance");
@@ -31,7 +31,8 @@ public class SubInstructionTest {
 
         String line = "CX, AX";
         Instruction subInstruction = (Instruction) context.getBean("sub", "", line, getInstructionFactory(machine));
-        subInstruction.execute(machine);
+        int result = subInstruction.execute(machine);
+        assertEquals(1, result);
         assertEquals(50, machine.getRegisters().get(CX));
         assertEquals(100, machine.getRegisters().get(AX));
     }
@@ -43,7 +44,8 @@ public class SubInstructionTest {
 
         String line = "CX, 100";
         Instruction subInstruction = (Instruction) context.getBean("sub", "", line, getInstructionFactory(machine));
-        subInstruction.execute(machine);
+        int result = subInstruction.execute(machine);
+        assertEquals(2, result);
         assertEquals(150, machine.getRegisters().get(CX));
     }
 
@@ -55,7 +57,8 @@ public class SubInstructionTest {
 
         String line = "CX, [1]";
         Instruction subInstruction = (Instruction) context.getBean("sub", "", line, getInstructionFactory(machine));
-        subInstruction.execute(machine);
+        int result = subInstruction.execute(machine);
+        assertEquals(2, result);
         assertEquals(40, machine.getRegisters().get(CX));
     }
 }

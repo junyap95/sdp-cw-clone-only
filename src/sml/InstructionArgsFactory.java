@@ -17,18 +17,27 @@ public class InstructionArgsFactory {
 
     // method - get the only instance of factory
     public static InstructionArgsFactory getInstructionFactory(Machine machine) {
-        if (instance == null) {
-            instance = new InstructionArgsFactory(machine);
-        }
+        if (instance == null) instance = new InstructionArgsFactory(machine);
         return instance;
     }
 
+    /**
+     * This method assumes that if the line of instruction contains a destination, it must have "," in the format
+     *
+     * @param line input string e.g. "AX, 1"
+     * @return an instance of InstructionDestination
+     */
     public InstructionDestination getInstructionDestination(String line) {
         if (!line.contains(",")) return null;
         String destination = line.split(", ")[0].trim();
         return getDestination(destination, this.machine);
     }
 
+    /**
+     * This method assumes that if the line of instruction contains a source, it can have "," in the format
+     * @param line input string e.g. "AX, 1" or "AX"
+     * @return an instance of InstructionSource
+     */
     public InstructionSource getInstructionSource(String line) {
         if (line.contains(",")) {
             String source = line.split(", ")[1].trim();
@@ -37,6 +46,11 @@ public class InstructionArgsFactory {
         return getSource(line.trim(), this.machine);
     }
 
+    /**
+     * This method is for jump instructions where there is no InstructionDestination or InstructionSource needed
+     * @param line input string e.g. "f3"
+     * @return string e.g. "f3"
+     */
     public String getInstructionAddress(String line) {
         return line.trim();
     }

@@ -32,8 +32,8 @@ public abstract class InstructionWithAddress extends Instruction {
     @Override
     public boolean equals(Object object) {
         if (object == null || getClass() != object.getClass()) return false;
-        InstructionWithAddress that = (InstructionWithAddress) object;
-        return Objects.equals(address, that.address);
+        InstructionWithAddress other = (InstructionWithAddress) object;
+        return Objects.equals(opcode, other.opcode) && Objects.equals(label, other.label) && Objects.equals(address, other.address);
     }
 
     @Override

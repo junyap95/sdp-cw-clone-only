@@ -15,6 +15,14 @@ public abstract class InstructionWithDestAndSrc extends Instruction {
     protected final InstructionDestination destination;
     protected final InstructionSource source;
 
+    /**
+     * Constructor
+     *
+     * @param label                  optional label
+     * @param opcode                 operation name
+     * @param line                   a line from the .sml file that has its label and opcode removed
+     * @param instructionArgsFactory a class that processes an instruction's destination and source
+     */
     public InstructionWithDestAndSrc(String label, String opcode, String line, InstructionArgsFactory instructionArgsFactory) {
         super(label, opcode);
         this.destination = instructionArgsFactory.getInstructionDestination(line);
@@ -35,7 +43,8 @@ public abstract class InstructionWithDestAndSrc extends Instruction {
     public boolean equals(Object object) {
         if (object == null || this.getClass() != object.getClass()) return false;
         InstructionWithDestAndSrc other = (InstructionWithDestAndSrc) object;
-        return Objects.equals(destination, other.destination) && Objects.equals(source, other.source);
+        return Objects.equals(opcode, other.opcode) && Objects.equals(label, other.label) && Objects.equals(destination, other.destination)
+               && Objects.equals(source, other.source);
     }
 
     @Override

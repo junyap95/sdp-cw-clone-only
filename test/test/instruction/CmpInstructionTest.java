@@ -15,6 +15,7 @@ import static sml.Registers.RegisterNameImpl.CX;
 public class CmpInstructionTest {
     private final ApplicationContext context = new ClassPathXmlApplicationContext("/beans.xml");
 
+    // Reference: https://blog.davidehringer.com/testing/test-driven-development/unit-testing-singletons/
     @BeforeEach
     public void resetSingleton() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         Field instance = InstructionArgsFactory.class.getDeclaredField("instance");
@@ -23,7 +24,7 @@ public class CmpInstructionTest {
     }
 
     @Test
-    void executeRegToReg() {
+    void executeRegToRegEqual() {
         Machine machine = new Machine(0x40_000);
         // numbers are equal
         machine.getRegisters().set(AX, 100);
@@ -33,40 +34,95 @@ public class CmpInstructionTest {
         Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
 
         assertFalse(machine.getFlags().getZF());
-        cmpInstruction.execute(machine);
-        assertTrue(machine.getFlags().getZF());
-
-        // first is smaller than the second
-        machine.getRegisters().set(AX, 150);
-
         assertFalse(machine.getFlags().getSF());
         cmpInstruction.execute(machine);
+        assertTrue(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+    }
+
+    @Test
+    void executeRegToRegSmallerThan() {
+        Machine machine = new Machine(0x40_000);
+        // numbers are equal
+        machine.getRegisters().set(AX, 150);
+        machine.getRegisters().set(CX, 100);
+
+        String line = "CX, AX";
+        Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
+
+        assertFalse(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+        cmpInstruction.execute(machine);
+        assertFalse(machine.getFlags().getZF());
         assertTrue(machine.getFlags().getSF());
     }
 
     @Test
-    void executeImmToReg() {
+    void executeRegToRegLargerThan() {
         Machine machine = new Machine(0x40_000);
         // numbers are equal
+        machine.getRegisters().set(AX, 50);
+        machine.getRegisters().set(CX, 100);
+
+        String line = "CX, AX";
+        Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
+
+        assertFalse(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+        cmpInstruction.execute(machine);
+        assertFalse(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+    }
+
+
+    @Test
+    void executeImmToRegEqual() {
+        Machine machine = new Machine(0x40_000);
         machine.getRegisters().set(CX, 100);
 
         String line = "CX, 100";
         Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
 
         assertFalse(machine.getFlags().getZF());
-        cmpInstruction.execute(machine);
-        assertTrue(machine.getFlags().getZF());
-
-        // first is smaller than the second
-        machine.getRegisters().set(CX, 50);
-
         assertFalse(machine.getFlags().getSF());
         cmpInstruction.execute(machine);
+        assertTrue(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+    }
+
+    @Test
+    void executeImmToRegSmallerThan() {
+        Machine machine = new Machine(0x40_000);
+        machine.getRegisters().set(CX, 50);
+
+        String line = "CX, 100";
+        Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
+
+        assertFalse(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+        cmpInstruction.execute(machine);
+        assertFalse(machine.getFlags().getZF());
         assertTrue(machine.getFlags().getSF());
     }
 
     @Test
-    void executeMemToReg() {
+    void executeImmToRegLargerThan() {
+        Machine machine = new Machine(0x40_000);
+        machine.getRegisters().set(CX, 150);
+
+        String line = "CX, 100";
+        Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
+
+        assertFalse(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+        cmpInstruction.execute(machine);
+        assertFalse(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+    }
+
+
+    @Test
+    void executeMemToRegEqual() {
         Machine machine = new Machine(0x40_000);
         machine.getMemory().set(1, 100);
         machine.getRegisters().set(CX, 100);
@@ -75,13 +131,41 @@ public class CmpInstructionTest {
         Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
 
         assertFalse(machine.getFlags().getZF());
-        cmpInstruction.execute(machine);
-        assertTrue(machine.getFlags().getZF());
-
-        // first is smaller than the second
-        machine.getRegisters().set(CX, 50);
         assertFalse(machine.getFlags().getSF());
         cmpInstruction.execute(machine);
+        assertTrue(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+    }
+
+    @Test
+    void executeMemToRegSmallerThan() {
+        Machine machine = new Machine(0x40_000);
+        machine.getMemory().set(1, 100);
+        machine.getRegisters().set(CX, 50);
+
+        String line = "CX, [1]";
+        Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
+
+        assertFalse(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+        cmpInstruction.execute(machine);
+        assertFalse(machine.getFlags().getZF());
         assertTrue(machine.getFlags().getSF());
+    }
+
+    @Test
+    void executeMemToRegLargerThan() {
+        Machine machine = new Machine(0x40_000);
+        machine.getMemory().set(1, 100);
+        machine.getRegisters().set(CX, 150);
+
+        String line = "CX, [1]";
+        Instruction cmpInstruction = (Instruction) context.getBean("cmp", "", line, getInstructionFactory(machine));
+
+        assertFalse(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
+        cmpInstruction.execute(machine);
+        assertFalse(machine.getFlags().getZF());
+        assertFalse(machine.getFlags().getSF());
     }
 }

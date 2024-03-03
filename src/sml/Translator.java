@@ -6,16 +6,16 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Map;
+import java.util.Scanner;
 
 import static sml.InstructionArgsFactory.getInstructionFactory;
 
 /**
  * This class reads the lines from a .sml file and interprets them as individual instructions,
- * and then store the information in the machine
+ * and then store the information in the machine's program
  * <p>
  * The translator of a <b>S</b><b>M</b>al<b>L</b> program.
- *
  */
 public final class Translator {
 
@@ -53,7 +53,8 @@ public final class Translator {
                     programCounter += instruction.getSize();
                 }
             }
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -86,7 +87,6 @@ public final class Translator {
     /**
      * Return the first word of line and remove it from line.
      * If there is no word, return "".
-     *
      */
     private String scan() {
         line = line.trim();

@@ -32,11 +32,11 @@ public abstract class InstructionWithSourceOnly extends Instruction {
     public boolean equals(Object object) {
         if (object == null || this.getClass() != object.getClass()) return false;
         InstructionWithSourceOnly other = (InstructionWithSourceOnly) object;
-        return Objects.equals(source, other.source);
+        return Objects.equals(opcode, other.opcode) && Objects.equals(label, other.label) && Objects.equals(source, other.source);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash( source);
+        return Objects.hash(source);
     }
 }

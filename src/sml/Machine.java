@@ -46,7 +46,6 @@ public final class Machine {
      * Precondition: the program and its labels have been stored properly.
      */
     public void execute() {
-        System.out.println(memory);
         programCounter = 0;
         registers.clear();
         int programSize = program.values().stream().mapToInt(Instruction::getSize).sum();

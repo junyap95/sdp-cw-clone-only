@@ -14,6 +14,7 @@ import static sml.Registers.RegisterNameImpl.*;
 class MulInstructionTest {
     private final ApplicationContext context = new ClassPathXmlApplicationContext("/beans.xml");
 
+    // Reference: https://blog.davidehringer.com/testing/test-driven-development/unit-testing-singletons/
     @BeforeEach
     public void resetSingleton() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         Field instance = InstructionArgsFactory.class.getDeclaredField("instance");
@@ -29,7 +30,8 @@ class MulInstructionTest {
         String line = "CX";
 
         Instruction mulInstruction = (Instruction) context.getBean("mul", "", line, getInstructionFactory(machine));
-        mulInstruction.execute(machine);
+        int result = mulInstruction.execute(machine);
+        assertEquals(1, result);
         assertEquals(200, machine.getRegisters().get(AX));
         assertEquals( 0, machine.getRegisters().get(DX));
     }
@@ -47,7 +49,8 @@ class MulInstructionTest {
         long valueCX = machine.getRegisters().get(CX);
         long mulResult = valueAX * valueCX;
         int mulResultUpper = (int) (mulResult >> 32);
-        mulInstruction.execute(machine);
+        int result = mulInstruction.execute(machine);
+        assertEquals(1, result);
         assertEquals((int) (valueCX * valueAX), machine.getRegisters().get(AX));
         assertEquals(mulResultUpper, machine.getRegisters().get(DX));
     }

@@ -44,7 +44,7 @@ public abstract class Instruction {
         return (getLabel() == null) ? "" : getLabel() + ": ";
     }
 
-    // Abstract keyword here  means that the toString method must be implemented by the subclass of this abstract class
+    // Abstract keyword here means that the toString method must be implemented by the subclass of this abstract class
     @Override
     public abstract String toString();
 

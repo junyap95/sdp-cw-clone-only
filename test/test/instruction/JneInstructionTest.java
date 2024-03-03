@@ -16,6 +16,7 @@ import static sml.InstructionArgsFactory.getInstructionFactory;
 class JneInstructionTest {
     private final ApplicationContext context = new ClassPathXmlApplicationContext("/beans.xml");
 
+    // Reference: https://blog.davidehringer.com/testing/test-driven-development/unit-testing-singletons/
     @BeforeEach
     public void resetSingleton() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         Field instance = InstructionArgsFactory.class.getDeclaredField("instance");
@@ -28,7 +29,7 @@ class JneInstructionTest {
         Machine machine = new Machine(0x40_000);
         String line = "f3";
         Instruction jneInstruction = (Instruction) context.getBean("jne", "", line, getInstructionFactory(machine));
-        machine.getLabels().addLabel("f3", 2);
+        machine.getLabels().addLabel("f3", 2); // assumes label has address of 2
         assertFalse(machine.getFlags().getZF());
         int jneExec = jneInstruction.execute(machine); // return int from getOffset()
         assertEquals(2, jneExec);
@@ -40,8 +41,8 @@ class JneInstructionTest {
         String line = "f3";
         machine.getFlags().setZF(true);
         Instruction jneInstruction = (Instruction) context.getBean("jne", "", line, getInstructionFactory(machine));
-        machine.getLabels().addLabel("f3", 2);
-        int jneExec = jneInstruction.execute(machine); // return int from getSize()
+        machine.getLabels().addLabel("f3", 2); // assumes label has address of 2
+        int jneExec = jneInstruction.execute(machine); // return int from getSize(), as flags conditions not met
         assertEquals(1, jneExec);
     }
 }
