@@ -72,6 +72,10 @@ public final class Translator {
         if (line.isEmpty()) return null;
         String opcode = scan();
         var context = new ClassPathXmlApplicationContext("/beans.xml");
+        // the getBean() call requires:
+        // opcode string to identify beans defined in the XML config
+        // label and line that already has opcode and label removed for the constructor
+        // a factory class for the constructor
         return (Instruction) context.getBean(opcode, label, this.line, getInstructionFactory(machine));
     }
 
@@ -87,6 +91,7 @@ public final class Translator {
     /**
      * Return the first word of line and remove it from line.
      * If there is no word, return "".
+     * The scan method is modified, boolean parameter no longer required for this implementation
      */
     private String scan() {
         line = line.trim();
