@@ -37,21 +37,22 @@ class MulInstructionTest {
     }
 
     @Test
-    void executeMaxInteger() {
+    void executeOverflowByOneAtUpper32Bits() {
         Machine machine = new Machine(0x40_000);
-        machine.getRegisters().set(AX, Integer.MAX_VALUE);
+        machine.getRegisters().set(AX, Integer.MAX_VALUE); // a signed int, 2147483647
         machine.getRegisters().set(DX, 0);
-        machine.getRegisters().set(CX, 2);
+        machine.getRegisters().set(CX, 4); // to get an overflow in upper 32 bits it has to be multiplied by 4
+        final int UPPER_OVERFLOW = 1;
 
         String line = "CX";
         Instruction mulInstruction = (Instruction) context.getBean("mul", "", line, getInstructionFactory(machine));
         long valueAX = machine.getRegisters().get(AX);
         long valueCX = machine.getRegisters().get(CX);
         long mulResult = valueAX * valueCX;
-        int mulResultUpper = (int) (mulResult >> 32);
+
         int result = mulInstruction.execute(machine);
         assertEquals(1, result);
-        assertEquals((int) (valueCX * valueAX), machine.getRegisters().get(AX));
-        assertEquals(mulResultUpper, machine.getRegisters().get(DX));
+        assertEquals((int) mulResult, machine.getRegisters().get(AX));
+        assertEquals(UPPER_OVERFLOW, machine.getRegisters().get(DX));
     }
 }
